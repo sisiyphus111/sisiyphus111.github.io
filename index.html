@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>你的名字 | 个人主页</title>
+<meta name="description" content="一句话介绍你自己">
+<style>
+  /* ========== 基础样式 ========== */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+    color: #2c2c2c;
+    background: #fff;
+    line-height: 1.8;
+  }
+  h1, h2, h3, .serif {
+    font-family: Georgia, "Times New Roman", "Songti SC", serif;
+    font-weight: 400;
+    letter-spacing: .5px;
+  }
+  img { display: block; width: 100%; height: auto; }
+  a { color: inherit; text-decoration: none; }
+
+  /* ========== 导航栏 ========== */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 18px 5vw;
+    transition: background .4s, box-shadow .4s, padding .4s;
+  }
+  nav.scrolled {
+    background: rgba(255,255,255,.92);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 1px 12px rgba(0,0,0,.08);
+    padding: 12px 5vw;
+  }
+  nav .logo { font-size: 20px; font-weight: 600; }
+  nav ul { display: flex; gap: 32px; list-style: none; font-size: 15px; }
+  nav ul a { opacity: .75; transition: opacity .3s; position: relative; }
+  nav ul a:hover { opacity: 1; }
+  nav ul a::after {
+    content: ""; position: absolute; left: 0; bottom: -4px;
+    width: 0; height: 1px; background: currentColor; transition: width .3s;
+  }
+  nav ul a:hover::after { width: 100%; }
+  /* 首屏时导航文字为白色 */
+  nav.hero-mode { color: #fff; }
+  nav.hero-mode .logo, nav.hero-mode ul a { text-shadow: 0 1px 6px rgba(0,0,0,.4); }
+
+  /* ========== 首屏大图 ========== */
+  header.hero {
+    height: 100vh; min-height: 560px;
+    background: url("https://picsum.photos/seed/hero-sunset/1920/1080") center/cover no-repeat;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    text-align: center; color: #fff; position: relative;
+  }
+  header.hero::before {
+    content: ""; position: absolute; inset: 0;
+    background: rgba(0,0,0,.35);
+  }
+  header.hero > * { position: relative; z-index: 1; }
+  header.hero h1 { font-size: clamp(38px, 6vw, 72px); margin-bottom: 16px; }
+  header.hero p { font-size: clamp(16px, 2vw, 22px); opacity: .9; }
+  .scroll-hint {
+    position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
+    width: 24px; height: 40px; border: 2px solid rgba(255,255,255,.8); border-radius: 14px;
+  }
+  .scroll-hint::before {
+    content: ""; position: absolute; top: 8px; left: 50%; margin-left: -2px;
+    width: 4px; height: 8px; border-radius: 2px; background: #fff;
+    animation: drop 1.6s infinite;
+  }
+  @keyframes drop {
+    0% { transform: translateY(0); opacity: 1; }
+    70% { transform: translateY(14px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 0; }
+  }
+
+  /* ========== 通用区块 ========== */
+  section { padding: 96px 5vw; }
+  .narrow { max-width: 860px; margin: 0 auto; }
+  .kicker {
+    text-align: center; color: #999; font-size: 14px;
+    letter-spacing: 4px; text-transform: uppercase; margin-bottom: 12px;
+  }
+  .section-title { text-align: center; font-size: clamp(28px, 4vw, 44px); margin-bottom: 56px; }
+
+  /* 淡入动画 */
+  .fade { opacity: 0; transform: translateY(32px); transition: opacity .8s ease, transform .8s ease; }
+  .fade.visible { opacity: 1; transform: none; }
+
+  /* ========== 关于我：图文左右 ========== */
+  .about-grid {
+    display: grid; grid-template-columns: 1fr 1.2fr; gap: 56px;
+    align-items: center; max-width: 1080px; margin: 0 auto;
+  }
+  .about-grid img { border-radius: 4px; box-shadow: 0 8px 30px rgba(0,0,0,.12); }
+  .about-grid h2 { font-size: 32px; margin-bottom: 20px; }
+  .about-grid p { color: #555; margin-bottom: 14px; }
+  .btn {
+    display: inline-block; margin-top: 12px; padding: 10px 28px;
+    border: 1px solid #2c2c2c; border-radius: 999px; font-size: 14px;
+    transition: all .3s;
+  }
+  .btn:hover { background: #2c2c2c; color: #fff; }
+
+  /* ========== 全宽图片分隔 ========== */
+  .full-image { padding: 0; }
+  .full-image img { height: 60vh; object-fit: cover; }
+
+  /* ========== 研究方向（仿原站：标题+大图+正文） ========== */
+  .topic { max-width: 1080px; margin: 0 auto 96px; }
+  .topic:last-child { margin-bottom: 0; }
+  .topic img { border-radius: 4px; margin: 28px 0; box-shadow: 0 8px 30px rgba(0,0,0,.1); }
+  .topic h3 { font-size: clamp(22px, 3vw, 30px); margin-bottom: 4px; }
+  .topic .subtitle { color: #999; font-size: 15px; margin-bottom: 20px; }
+  .topic p { color: #444; max-width: 820px; }
+
+  /* ========== 项目卡片 ========== */
+  .cards {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 28px; max-width: 1080px; margin: 0 auto;
+  }
+  .card {
+    border: 1px solid #eee; border-radius: 8px; overflow: hidden;
+    transition: transform .3s, box-shadow .3s; background: #fff;
+  }
+  .card:hover { transform: translateY(-6px); box-shadow: 0 12px 32px rgba(0,0,0,.12); }
+  .card img { height: 180px; object-fit: cover; }
+  .card .body { padding: 22px; }
+  .card h4 { font-size: 18px; margin-bottom: 8px; font-family: Georgia, serif; font-weight: 400; }
+  .card p { font-size: 14px; color: #666; }
+  .card .tag { display: inline-block; margin-top: 12px; font-size: 12px; color: #999; border: 1px solid #eee; border-radius: 999px; padding: 2px 12px; }
+
+  /* ========== 页脚 ========== */
+  footer {
+    background: #1c1c1e; color: #bbb; text-align: center; padding: 64px 5vw 40px;
+  }
+  footer .social { display: flex; justify-content: center; gap: 28px; margin-bottom: 24px; }
+  footer .social a { opacity: .8; transition: opacity .3s; }
+  footer .social a:hover { opacity: 1; }
+  footer .social svg { width: 22px; height: 22px; fill: #bbb; }
+  footer small { color: #666; font-size: 13px; }
+
+  /* ========== 响应式 ========== */
+  @media (max-width: 768px) {
+    nav ul { gap: 18px; font-size: 13px; }
+    .about-grid { grid-template-columns: 1fr; gap: 32px; }
+    section { padding: 64px 6vw; }
+    .full-image img { height: 40vh; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 替换说明：
+  1. 把所有 https://picsum.photos/... 占位图换成你自己的图片地址
+  2. 修改标题、姓名、简介、研究方向、项目、联系方式
+  3. 部署：在 GitHub 建名为 你的用户名.github.io 的仓库，把本文件改名为 index.html 上传即可
+-->
+
+<nav id="nav" class="hero-mode">
+  <div class="logo">你的名字</div>
+  <ul>
+    <li><a href="#about">关于</a></li>
+    <li><a href="#research">研究</a></li>
+    <li><a href="#projects">项目</a></li>
+    <li><a href="#contact">联系</a></li>
+  </ul>
+</nav>
+
+<!-- ========== 首屏 ========== -->
+<header class="hero">
+  <h1>你的名字</h1>
+  <p>一句话介绍你自己 · Complex World, Simple Rules</p>
+  <div class="scroll-hint"></div>
+</header>
+
+<!-- ========== 关于我 ========== -->
+<section id="about">
+  <div class="about-grid fade">
+    <img src="https://picsum.photos/seed/about-portrait/800/1000" alt="我的照片">
+    <div>
+      <h2>你好，我是 名字</h2>
+      <p>这里写一段自我介绍：你的身份（学生 / 研究员 / 开发者），所在学校或公司，你关心什么问题。</p>
+      <p>再补一句你的兴趣方向或正在做的事，两三句话即可，保持简洁。仿原站的风格：留白多、文字少、大图说话。</p>
+      <a class="btn" href="#contact">联系我</a>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 全宽图片分隔 ========== -->
+<div class="full-image">
+  <img src="https://picsum.photos/seed/wide-banner/1920/800" alt="">
+</div>
+
+<!-- ========== 研究方向 ========== -->
+<section id="research">
+  <p class="kicker fade">Research</p>
+  <h2 class="section-title fade">研究方向</h2>
+
+  <div class="topic fade">
+    <h3>方向一：标题</h3>
+    <p class="subtitle">副标题 / 关键词</p>
+    <p>这里写该方向的简介，仿原站的风格：先一句总括，再两三句说明核心问题和你关心的机制。例如：这条研究线关注某某领域中的经验规律，通过构建简洁的模型解释这些规律从何而来、何时失效。</p>
+    <img src="https://picsum.photos/seed/research-a/1600/900" alt="方向一插图">
+  </div>
+
+  <div class="topic fade">
+    <h3>方向二：标题</h3>
+    <p class="subtitle">副标题 / 关键词</p>
+    <p>第二段简介，说明方法或视角上的特点：比如关注微观规则与宏观模式之间的联系、跨尺度建模、可解释性与可计算性等。</p>
+    <img src="https://picsum.photos/seed/research-b/1600/900" alt="方向二插图">
+  </div>
+
+  <div class="topic fade">
+    <h3>方向三：标题</h3>
+    <p class="subtitle">副标题 / 关键词</p>
+    <p>第三段简介，可以介绍一个具体项目或长期目标，放一张配图收束整个研究板块。</p>
+    <img src="https://picsum.photos/seed/research-c/1600/900" alt="方向三插图">
+  </div>
+</section>
+
+<!-- ========== 全宽图片分隔 ========== -->
+<div class="full-image">
+  <img src="https://picsum.photos/seed/wide-banner-2/1920/800" alt="">
+</div>
+
+<!-- ========== 项目 ========== -->
+<section id="projects">
+  <p class="kicker fade">Projects</p>
+  <h2 class="section-title fade">精选项目</h2>
+  <div class="cards">
+    <div class="card fade">
+      <img src="https://picsum.photos/seed/project-1/800/500" alt="">
+      <div class="body">
+        <h4>项目名一</h4>
+        <p>一句话介绍这个项目解决了什么问题、用了什么技术。</p>
+        <span class="tag">Python</span>
+      </div>
+    </div>
+    <div class="card fade">
+      <img src="https://picsum.photos/seed/project-2/800/500" alt="">
+      <div class="body">
+        <h4>项目名二</h4>
+        <p>一句话介绍这个项目解决了什么问题、用了什么技术。</p>
+        <span class="tag">Web</span>
+      </div>
+    </div>
+    <div class="card fade">
+      <img src="https://picsum.photos/seed/project-3/800/500" alt="">
+      <div class="body">
+        <h4>项目名三</h4>
+        <p>一句话介绍这个项目解决了什么问题、用了什么技术。</p>
+        <span class="tag">Data</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 页脚 ========== -->
+<footer id="contact">
+  <div class="social">
+    <!-- GitHub -->
+    <a href="https://github.com/你的用户名" target="_blank" aria-label="GitHub">
+      <svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+    </a>
+    <!-- Email -->
+    <a href="mailto:you@example.com" aria-label="Email">
+      <svg viewBox="0 0 16 16"><path d="M1.75 2h12.5c.966 0 1.75.784 1.75 1.75v8.5A1.75 1.75 0 0 1 14.25 14H1.75A1.75 1.75 0 0 1 0 12.25v-8.5C0 2.784.784 2 1.75 2Zm.22 1.5-.22.22v.44l6.5 4.28 6.5-4.28v-.44l-.22-.22Zm13.28 1.1L8.25 9.06a.75.75 0 0 1-.5 0L1 4.6v7.65c0 .138.112.25.25.25h12.5a.25.25 0 0 0 .25-.25Z"/></svg>
+    </a>
+  </div>
+  <p class="serif" style="margin-bottom:12px;">保持联系</p>
+  <small>© 2026 你的名字 · Powered by GitHub Pages</small>
+</footer>
+
+<script>
+  // 导航栏：滚过首屏后切换为白底黑字
+  const nav = document.getElementById('nav');
+  const hero = document.querySelector('.hero');
+  const onScroll = () => {
+    const past = window.scrollY > hero.offsetHeight - 80;
+    nav.classList.toggle('scrolled', past);
+    nav.classList.toggle('hero-mode', !past);
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // 滚动淡入
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.fade').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
